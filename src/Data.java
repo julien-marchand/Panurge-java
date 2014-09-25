@@ -20,7 +20,9 @@ public class Data {
 	
 	private double[][] variablesArray = new double[][]{date, open,high, low, close, volume, adjClose};
 	
-	public void getData() throws IOException {
+	public static String[] companySymbols = new String[] {"SAP", "ACE", "BNP", "MSFT"};
+	
+	public void getData(String companySymbol) throws IOException {
 		ArrayList<Double> dateList = new ArrayList<>();
 		ArrayList<Double> openList = new ArrayList<>();
 		ArrayList<Double> highList = new ArrayList<>();
@@ -30,7 +32,7 @@ public class Data {
 		ArrayList<Double> adjCloseList = new ArrayList<>();
 		ArrayList[] lists = new ArrayList[]{dateList, openList, highList, lowList, closeList, volumeList, adjCloseList};
 		
-		String urlString = "http://ichart.yahoo.com/table.csv?s=SAP";
+		String urlString = "http://ichart.yahoo.com/table.csv?s=" + companySymbol;
 		URL url = new URL(urlString);
 		InputStreamReader inputStream = new InputStreamReader(url.openStream());
 		BufferedReader br = new BufferedReader(inputStream);
@@ -73,7 +75,7 @@ public class Data {
 	public static void main(String[] args) {
 		Data data = new Data();
 		try {
-			data.getData();
+			data.getData("SAP");
 			double[][] table = data.getLists();
 			System.out.println(table[4][450]);
 		} catch (IOException e) {
