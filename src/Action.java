@@ -10,6 +10,7 @@ import java.util.Date;
 public class Action {
 	private String name;
 
+	private int n;
 	private double[] date;
 	private double[] open;
 	private double[] high;
@@ -68,13 +69,14 @@ public class Action {
 			// TODO IOException
 			e.printStackTrace();
 		}
-		date = new double[lists[0].size()];
-		open = new double[lists[0].size()];
-		high = new double[lists[0].size()];
-		low = new double[lists[0].size()];
-		close = new double[lists[0].size()];
-		volume = new double[lists[0].size()];
-		adjClose = new double[lists[0].size()];
+		n = lists[0].size();
+		date = new double[n];
+		open = new double[n];
+		high = new double[n];
+		low = new double[n];
+		close = new double[n];
+		volume = new double[n];
+		adjClose = new double[n];
 		double[][] variablesArray = new double[][]{date, open,high, low, close, volume, adjClose};
 		for (int i = 0; i < lists.length; i++) {
 			for (int j = 0; j < variablesArray[i].length; j++) {
@@ -104,7 +106,7 @@ public class Action {
 	}
 	
 	public void prepareStockastic(int nK, int nD, int nDS, int nDSS) {
-		int numberOfDays = date.length;
+		int numberOfDays = n;
 		
 		// (close - minOfPeriodnK) / (maxOfPeriodnK - minOfPeriodnK)
 		stocK = new double[numberOfDays-nK];
@@ -126,7 +128,6 @@ public class Action {
 				max = Math.max(max,high[i+j]);
 			}
 			stocK[i] = (close[i]-min) / (max-min);
-			System.out.println(stocK[i]);
 		}
 		
 		for(int i=0; i < numberOfDays-nK-nD; ++i){
@@ -152,5 +153,36 @@ public class Action {
 			}
 			stocDSS[i] = sum / nDSS;
 		}
+	}
+	
+	public double getEarningRatio(){
+		double cpt1 = 0.0;
+		double cpt2 = 0.0;
+		double gain = 1;
+		double[] s1 = stocD;
+		double[] s2 = stocDS;
+		for(int i=1;i<stocDS.length-1;++i){
+			if((s1[i]<s2[i] + 0.05) && (s1[i+1]>s2[i+1]+0.10)){
+				gain = gain/close[i-1]*close[i];
+				++cpt1;
+				System.out.println((close.length)-i);
+				if(close[i-1] < close[i]){
+					++cpt2;
+					System.out.println("valide! :) -> ");
+					System.out.println("passe de " + close[i+1] + " a " + close[i] + " : " + (close[i]-close[i+10]));
+				}
+				else {
+					System.out.println("invalide >< ");
+					System.out.println("passe de " + close[i+1] + " a " + close[i] + " : " + (close[i]-close[i+1]));
+				}
+			}
+	    }
+		System.out.println("intersections: " + cpt1);
+		System.out.println("valides: " + cpt2);
+		System.out.println("gain: " + gain);
+		if(cpt1 != 0){
+			System.out.println("gain moyen: " + (Math.pow(gain,1/cpt1)-1)*100 + "%");
+		}
+		return (Math.pow(gain,1/cpt1)-1)*100;
 	}
 }
