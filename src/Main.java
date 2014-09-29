@@ -8,13 +8,16 @@ public class Main {
 	
 	//
 	public static void main(String[] args) {
-		String[] companySymbols = new String[] {"SAP"};//, "ACE", "MSFT"};
-		
-		for (String symbol:companySymbols) {
-			Action action = new Action(symbol);
+		String[] companySymbols = new String[] {"SAP", "ACE", "MSFT"};
+		double[] earnings = new double[companySymbols.length];
+		for (int i=0; i< companySymbols.length; ++i) {
+			Action action = new Action(companySymbols[i]);
 			action.buildAction();
-			action.getEarningRatio();
+			earnings[i] = action.getEarningRatio();
+		}
+		System.out.println("------------------------------------");
+		for (int i=0; i< companySymbols.length; ++i) {
+			System.out.println(companySymbols[i] + ": " + earnings[i]);
 		}
 	}
-
 }

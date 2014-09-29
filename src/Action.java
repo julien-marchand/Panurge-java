@@ -46,7 +46,7 @@ public class Action {
 		ArrayList<Double> closeList = new ArrayList<>();
 		ArrayList<Double> volumeList = new ArrayList<>();
 		ArrayList<Double> adjCloseList = new ArrayList<>();
-		ArrayList[] lists = new ArrayList[]{dateList, openList, highList, lowList, closeList, volumeList, adjCloseList};
+		ArrayList<Double>[] lists = new ArrayList[]{dateList, openList, highList, lowList, closeList, volumeList, adjCloseList};
 		
 		try {
 			String urlString = "http://ichart.yahoo.com/table.csv?s=" + companySymbol;
@@ -110,13 +110,10 @@ public class Action {
 		
 		// (close - minOfPeriodnK) / (maxOfPeriodnK - minOfPeriodnK)
 		stocK = new double[numberOfDays-nK];
-		
 		// average of stocK on a nD-period
 		stocD = new double[numberOfDays-nK-nD];
-
 		// average of stocD on a nDS-period
 		stocDS = new double[numberOfDays-nK-nD-nDS];
-
 		// average of stocDS on a nDSS-period
 		stocDSS = new double[numberOfDays-nK-nD-nDS-nDSS];
 		
@@ -133,7 +130,7 @@ public class Action {
 		for(int i=0; i < numberOfDays-nK-nD; ++i){
 			double sum = 0;
 			for(int j=0; j<nD; ++j){
-				sum += stocK[i];
+				sum += stocK[i+j];
 			}
 			stocD[i] = sum / nD;
 		}
@@ -141,7 +138,7 @@ public class Action {
 		for(int i=0; i < numberOfDays-nK-nD-nDS; ++i){
 			double sum = 0;
 			for(int j=0; j<nDS; ++j){
-				sum += stocD[i];
+				sum += stocD[i+j];
 			}
 			stocDS[i] = sum / nDS;
 		}
@@ -149,40 +146,51 @@ public class Action {
 		for(int i=0; i < numberOfDays-nK-nD-nDS-nDSS; ++i){
 			double sum = 0;
 			for(int j=0; j<nDSS; ++j){
-				sum += stocDS[i];
+				sum += stocDS[i+j];
 			}
 			stocDSS[i] = sum / nDSS;
 		}
 	}
 	
 	public double getEarningRatio(){
-		double cpt1 = 0.0;
-		double cpt2 = 0.0;
-		double gain = 1;
-		double[] s1 = stocD;
-		double[] s2 = stocDS;
-		for(int i=1;i<stocDS.length-1;++i){
-			if((s1[i]<s2[i] + 0.05) && (s1[i+1]>s2[i+1]+0.10)){
-				gain = gain/close[i-1]*close[i];
-				++cpt1;
-				System.out.println((close.length)-i);
-				if(close[i-1] < close[i]){
-					++cpt2;
-					System.out.println("valide! :) -> ");
-					System.out.println("passe de " + close[i+1] + " a " + close[i] + " : " + (close[i]-close[i+10]));
+		int interCount = 0, winCount = 0;
+		double gain = 1.0;
+		
+		//Parameters
+		double[] sUp = stocDS;
+		double[] sDown = stocDSS;
+		int holdingDuration = 2;
+		int analysisLength = -1;
+		boolean buy = true;
+		
+		// #Obvious #Troll #C'estDégueulasse
+		analysisLength = (analysisLength==-1?
+				Math.min(sUp.length, sDown.length)-5
+				:Math.min(Math.min(sUp.length, sDown.length)-5, analysisLength));
+		
+		for(int i=holdingDuration; i < analysisLength; ++i){
+			if(
+					sUp[i] < sDown[i]
+					&& sUp[i] + 0.05 > sDown[i]
+					&& sUp[i+1] < sDown[i+1] + 0.10){
+				gain = gain* (buy==true?close[i-holdingDuration]/close[i]:close[i]/close[i-holdingDuration]);
+				++interCount;
+				if(close[i-holdingDuration] < close[i]){
+					++winCount;
+//					System.out.println("V | Passe de " + close[i] + " a " + close[i-holdingDuration] + " : " + Utils.round(close[i]-close[i-holdingDuration],4));
 				}
 				else {
-					System.out.println("invalide >< ");
-					System.out.println("passe de " + close[i+1] + " a " + close[i] + " : " + (close[i]-close[i+1]));
+//					System.out.println("D | Passe de " + close[i] + " a " + close[i-holdingDuration] + " : " + Utils.round(close[i]-close[i-holdingDuration],4));
 				}
 			}
 	    }
-		System.out.println("intersections: " + cpt1);
-		System.out.println("valides: " + cpt2);
-		System.out.println("gain: " + gain);
-		if(cpt1 != 0){
-			System.out.println("gain moyen: " + (Math.pow(gain,1/cpt1)-1)*100 + "%");
-		}
-		return (Math.pow(gain,1/cpt1)-1)*100;
+		System.out.println("Validées: " + winCount + "/" + interCount + " = " + Utils.round((double)winCount/interCount,2) + "%");
+		System.out.println("Gain: " + Utils.round(gain,4));
+		
+		if(interCount == 0) return -1;
+
+		System.out.println("Gain moyen: " + Utils.round((Math.pow(gain,1.0/interCount)-1)*100,4) + "%");
+		System.out.println("Gain annuel: " + (gain>1?"+":"") + Utils.round((Math.pow(gain,365.0/interCount)-1)*100,4) + "%");
+		return (Math.pow(gain,1.0/interCount)-1)*100;
 	}
 }
