@@ -16,13 +16,20 @@ public class CompanySymbol {
 
 	public static void getNasdaqSymbols() {
 		ArrayList<String> symbols = new ArrayList<>();
+		for (int page = 1; page < 61; page++) {
+			symbols.addAll(vacuumNasdaqPage(page));
+		}
+		System.out.println(symbols.size());
+	}
+	
+	public static ArrayList<String> vacuumNasdaqPage (int pageNumber) {
+		System.out.println("Page number = " + pageNumber);
+		ArrayList<String> symbols = new ArrayList<>();
 		try{
-			//http://www.boursorama.com/bourse/actions/inter_az.phtml?PAYS=1&BI=103&validate=
-			//http://www.boursorama.com/bourse/actions/inter_az.phtml?PAYS=1&BI=103&validate=&page=2
-			String urlString = "http://www.boursorama.com/bourse/actions/inter_az.phtml?PAYS=1&BI=103&validate=";
+			String urlString = "http://www.boursorama.com/bourse/actions/inter_az.phtml?PAYS=1&BI=103&validate=&page=" + pageNumber;
 			BufferedReader br = Utils.getURL(urlString);
 			if (br == null) {
-				return;
+				return symbols;
 			}
 			String line = null;
 			int count = 0;
@@ -34,12 +41,9 @@ public class CompanySymbol {
 					count++;
 				}
 				if(count == 2){
-					//System.out.println("Line : " + line);
 					String[] t = line.split("=");
 					String symbol = t[4].substring(0, t[4].length()-2);
-					System.out.println("t : " + symbol);
 					symbols.add(symbol);
-					//System.out.println("liste : " + liste);
 					count = 0;
 				}
 			} 
@@ -48,7 +52,7 @@ public class CompanySymbol {
 		} catch (IOException io) {
 			io.printStackTrace();
 		}
-		System.out.println("Done");
+		return symbols;
 	}
 	
 	public static void main(String[] args) {
