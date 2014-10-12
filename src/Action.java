@@ -28,17 +28,26 @@ public class Action {
 		this.name = name;
 	}
 	
-	public void buildAction(){
-		getData(name);
+	public boolean buildAction(){
+		boolean retrieved = getData(name);
+		if (!retrieved) {
+			return false;
+		}
 		prepareData();
 		computeRating();
+		return true;
 	}
 	
 	private void computeRating() {
 		// TODO compute a score describing the quality of the algorithm for the past 6-months period
 	}
 
-	public void getData(String companySymbol) {
+	/**
+	 * Retrieves the financial data for the specified company on Yahoo.
+	 * @param companySymbol
+	 * @return <code>true</code> if the procedure ended properly, <code>false</code> otherwise.
+	 */
+	public boolean getData(String companySymbol) {
 		ArrayList<Double> dateList = new ArrayList<>();
 		ArrayList<Double> openList = new ArrayList<>();
 		ArrayList<Double> highList = new ArrayList<>();
@@ -49,11 +58,13 @@ public class Action {
 		@SuppressWarnings("unchecked")
 		ArrayList<Double>[] lists = new ArrayList[]{dateList, openList, highList, lowList, closeList, volumeList, adjCloseList};
 		
+		String urlString = "http://ichart.yahoo.com/table.csv?s=" + companySymbol;
+		BufferedReader br = Utils.getURL(urlString);
+		if (br == null) {
+			System.err.println("Company symbol " + companySymbol + " doesn't exist. Aborting");
+			return false;
+		}
 		try {
-			String urlString = "http://ichart.yahoo.com/table.csv?s=" + companySymbol;
-			URL url = new URL(urlString);
-			InputStreamReader inputStream = new InputStreamReader(url.openStream());
-			BufferedReader br = new BufferedReader(inputStream);
 			String line = br.readLine();
 			while ((line = br.readLine()) != null) {
 				String[] explodedLine = line.split(",");
@@ -67,8 +78,8 @@ public class Action {
 			}
 			br.close();
 		} catch (IOException e) {
-			// TODO IOException
-			e.printStackTrace();
+			System.err.println("Company symbol " + companySymbol + " doesn't exist. Aborting");
+			return false;
 		}
 		n = lists[0].size();
 		date = new double[n];
@@ -84,6 +95,7 @@ public class Action {
 				variablesArray[i][j] = (double) lists[i].get(j);
 			}
 		}
+		return true;
 	}
 	
 	private void stringToTimestamp(String dateString, ArrayList<Double> dateList) {
