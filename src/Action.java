@@ -57,11 +57,13 @@ public class Action {
 		ArrayList<Double> adjCloseList = new ArrayList<>();
 		ArrayList<Double>[] lists = new ArrayList[]{dateList, openList, highList, lowList, closeList, volumeList, adjCloseList};
 		
+		String urlString = "http://ichart.yahoo.com/table.csv?s=" + companySymbol;
+		BufferedReader br = Utils.getURL(urlString);
+		if (br == null) {
+			System.err.println("Company symbol " + companySymbol + " doesn't exist. Aborting");
+			return false;
+		}
 		try {
-			String urlString = "http://ichart.yahoo.com/table.csv?s=" + companySymbol;
-			URL url = new URL(urlString);
-			InputStreamReader inputStream = new InputStreamReader(url.openStream());
-			BufferedReader br = new BufferedReader(inputStream);
 			String line = br.readLine();
 			while ((line = br.readLine()) != null) {
 				String[] explodedLine = line.split(",");

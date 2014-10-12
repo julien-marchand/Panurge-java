@@ -2,7 +2,6 @@
 
 public class Main {
 
-	public static String[] CAC40_SYMBOLS = new String[] {"AC","AI","ALU","ALO","MTP","CS","BNP","EN","CAP","CA","ACA","BN","EAD","EDF","EF","FTE","GSZ","OR","LG","LR","MC","ML","RI","UG","PP","PUB","RNO","SAF","SGO","SAN","SU","GLE","STM","TEC","FP","UL","VK","VIE","DG","VIV"};
 	//
 	
 	//
