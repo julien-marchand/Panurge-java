@@ -19,10 +19,10 @@ public class Action {
 	private double[] volume;
 	private double[] adjClose;
 	
-	private double[] stocK;
-	private double[] stocD;
-	private double[] stocDS;
-	private double[] stocDSS;
+	public double[] stocK;
+	public double[] stocD;
+	public double[] stocDS;
+	public double[] stocDSS;
 	
 	public Action(String name){
 		this.name = name;
@@ -46,6 +46,7 @@ public class Action {
 		ArrayList<Double> closeList = new ArrayList<>();
 		ArrayList<Double> volumeList = new ArrayList<>();
 		ArrayList<Double> adjCloseList = new ArrayList<>();
+		@SuppressWarnings("unchecked")
 		ArrayList<Double>[] lists = new ArrayList[]{dateList, openList, highList, lowList, closeList, volumeList, adjCloseList};
 		
 		try {
@@ -157,11 +158,12 @@ public class Action {
 		double gain = 1.0;
 		
 		//Parameters
-		double[] sUp = stocDS;
+		double[] sUp = stocK;
 		double[] sDown = stocDSS;
-		int holdingDuration = 2;
-		int analysisLength = -1;
-		boolean buy = true;
+		int holdingDuration = 5;
+		int analysisLength = 365;
+		
+		ChoiceAlgo algo = new StockLT(0.1);
 		
 		// #Obvious #Troll #C'estDégueulasse
 		analysisLength = (analysisLength==-1?
@@ -169,28 +171,29 @@ public class Action {
 				:Math.min(Math.min(sUp.length, sDown.length)-5, analysisLength));
 		
 		for(int i=holdingDuration; i < analysisLength; ++i){
-			if(
-					sUp[i] < sDown[i]
-					&& sUp[i] + 0.05 > sDown[i]
-					&& sUp[i+1] < sDown[i+1] + 0.10){
-				gain = gain* (buy==true?close[i-holdingDuration]/close[i]:close[i]/close[i-holdingDuration]);
+			int buyOrSell = algo.buyOrSell(this, i);
+			if(buyOrSell == 1) {
 				++interCount;
-				if(close[i-holdingDuration] < close[i]){
+				gain = gain * close[i-holdingDuration]/close[i];
+				if(close[i-holdingDuration] > close[i]) {
 					++winCount;
-//					System.out.println("V | Passe de " + close[i] + " a " + close[i-holdingDuration] + " : " + Utils.round(close[i]-close[i-holdingDuration],4));
 				}
-				else {
-//					System.out.println("D | Passe de " + close[i] + " a " + close[i-holdingDuration] + " : " + Utils.round(close[i]-close[i-holdingDuration],4));
+			}
+			else if (buyOrSell == -1) {
+				++interCount;
+				gain = gain * close[i]/close[i-holdingDuration];
+				if(close[i-holdingDuration] < close[i]) {
+					++winCount;
 				}
 			}
 	    }
 		System.out.println("Validées: " + winCount + "/" + interCount + " = " + Utils.round((double)winCount/interCount,2) + "%");
 		System.out.println("Gain: " + Utils.round(gain,4));
 		
-		if(interCount == 0) return -1;
+		if(interCount == 0) return 0;
 
-		System.out.println("Gain moyen: " + Utils.round((Math.pow(gain,1.0/interCount)-1)*100,4) + "%");
-		System.out.println("Gain annuel: " + (gain>1?"+":"") + Utils.round((Math.pow(gain,365.0/interCount)-1)*100,4) + "%");
-		return (Math.pow(gain,1.0/interCount)-1)*100;
+		System.out.println("Gain moyen: " + Utils.round((Math.pow(gain,1.0*holdingDuration/interCount)-1)*100,4) + "%");
+		System.out.println("Gain annuel: " + (gain>1?"+":"") + Utils.round((Math.pow(gain,365.0/holdingDuration/interCount)-1)*100,4) + "%");
+		return (Math.pow(gain,1.0/holdingDuration/interCount)-1)*100;
 	}
 }

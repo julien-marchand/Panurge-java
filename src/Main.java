@@ -17,7 +17,7 @@ public class Main {
 		}
 		System.out.println("------------------------------------");
 		for (int i=0; i< companySymbols.length; ++i) {
-			System.out.println(companySymbols[i] + ": " + earnings[i]);
+			System.out.println(companySymbols[i] + ": " + Utils.round(earnings[i],4));
 		}
 	}
 }
