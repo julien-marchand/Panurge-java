@@ -1,6 +1,6 @@
 package algos;
 
-import action.Action;
+import fuckGit.Action;
 
 /**
  * Copyright (c) 2014 Julien Marchand.
