@@ -1,5 +1,4 @@
 package action;
-
 /**
  * Copyright (c) 2014 Julien Marchand.
  */
@@ -36,7 +35,8 @@ public class Action {
 	public double[] stocDS;
 	public double[] stocDSS;
 	
-	public double[][] MMA = new double[1000][0];
+	public double[] MMA20;
+	public double[] MMA50;
 	
 	public Action(String name){
 		this.name = name;
@@ -126,26 +126,23 @@ public class Action {
 
 	public void prepareData() {
 		prepareStockastic();
+		MMA20 = prepareMMA(20);
+		MMA50 = prepareMMA(50);
 	}
 	
 	/**
-	 * Moyenne mobile arithmétique du cours sur nMMA jours
+	 * Moyenne mobile du cours sur nMMA jours
 	 * @source http://www.abcbourse.com/apprendre/11_lecon2.html
 	 */
 	private double[] prepareMMA(int nMMA) {
 		double[] tab = new double[n-nMMA];
 		for(int i=0; i < n-nMMA; ++i){
-			for(int j=0; j<nMMA; ++j)
+			for(int j=0; j<nMMA; ++n){
 				tab[i] += close[i+j];
+			}
 			tab[i] /= nMMA;
 		}
 		return tab;
-	}
-	
-	public double[] getMMA(int nMMA) {
-		if(MMA[nMMA].length == 0)
-			MMA[nMMA] = prepareMMA(nMMA);
-		return MMA[nMMA];
 	}
 
 	public void prepareStockastic(){
@@ -202,27 +199,28 @@ public class Action {
 		double gain = 1.0;
 		
 		//Parameters
-//		double[] sUp = stocK;
-//		double[] sDown = stocDSS;
+		double[] sUp = stocK;
+		double[] sDown = stocDSS;
 		int holdingDuration = 5;
-		int analysisLength = 3650;
+		int analysisLength = 365;
 		
 		ChoiceAlgo[] AlgosToBeExecuted = new ChoiceAlgo[]{
-				new StockLT(5, 0.03),
-				new StockGT(5, 0.97)
-//				new MMAX(getMMA(20), getMMA(50), new double[]{1.0001, 1.0001})
+				new StockLT(0.05),
+				new StockGT(0.95)
 		};
 		
 		// #Obvious #Troll #C'estDégueulasse
-//		analysisLength = (analysisLength==-1?
-//				Math.min(sUp.length, sDown.length)-5
-//				:Math.min(Math.min(sUp.length, sDown.length)-5, analysisLength));
+		analysisLength = (analysisLength==-1?
+				Math.min(sUp.length, sDown.length)-5
+				:Math.min(Math.min(sUp.length, sDown.length)-5, analysisLength));
 		
 		for(int i=holdingDuration; i < analysisLength; ++i){
+//			int buyOrSell = algo1.buyOrSell(this, i);
 			int[] orders = new int[AlgosToBeExecuted.length];
 			for(int j=0; j<orders.length; ++j)
 				orders[j] = AlgosToBeExecuted[j].buyOrSell(this, i);
 			int buyOrSell  = Utils.aggregateOrders(orders);
+			
 			if(buyOrSell == Action.BUY_ORDER) {
 				++interCount;
 				gain = gain * close[i-holdingDuration]/close[i];

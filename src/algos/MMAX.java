@@ -34,5 +34,4 @@ public class MMAX extends ChoiceAlgo {
 		}
 		return 1;
 	}
-
 }
