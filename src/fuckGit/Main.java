@@ -1,7 +1,7 @@
 package fuckGit;
 
-import action.Action;
-import action.Utils;
+import fuckGit.Action;
+import fuckGit.Utils;
 
 /**
  * Copyright (c) 2014 Julien Marchand.
