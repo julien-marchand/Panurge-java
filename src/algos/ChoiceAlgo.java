@@ -1,6 +1,5 @@
 package algos;
 
-
 /**
  * Copyright (c) 2014 Julien Marchand.
  */
