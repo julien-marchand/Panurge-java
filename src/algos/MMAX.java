@@ -9,23 +9,25 @@ import action.Action;
 public class MMAX extends ChoiceAlgo {
 	
 	private double[] perCents;
-	private double[] increase;
-	private double[] decrease;
+	private int nMMAincrease;
+	private int nMMAdecrease;
 	
 	/**
 	 * Crossing verifying : increase[t] > decrease[t] + ε and increase[t_older] + ε < decrease[t_older]
-	 * @param increase
-	 * @param decrease
+	 * @param nMMAincrease
+	 * @param nMMAdecrease
 	 * @param perCents
 	 */
-	public MMAX(int holdingDuration, double[] increase, double[] decrease, double... perCents){
+	public MMAX(int holdingDuration, int nMMAincrease, int nMMAdecrease, double... perCents){
 		this.holdingDuration = holdingDuration;
-		this.increase = increase;
-		this.decrease = decrease;
+		this.nMMAincrease = nMMAincrease;
+		this.nMMAdecrease = nMMAdecrease;
 		this.perCents = perCents;
 	}
 	
 	public int buyOrSell(Action action, int time) {
+		double[] increase = action.getMMA(nMMAincrease);
+		double[] decrease = action.getMMA(nMMAdecrease);
 		if(!(increase[time] >= decrease[time]*perCents[0]))
 			return 0;
 		for(int i=1; i<perCents.length; ++i){

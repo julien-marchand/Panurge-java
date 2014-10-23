@@ -210,7 +210,7 @@ public class Action {
 		ChoiceAlgo[] AlgosToBeExecuted = new ChoiceAlgo[]{
 				new StockLT(5, 0.03),
 				new StockGT(5, 0.97)
-//				new MMAX(getMMA(20), getMMA(50), new double[]{1.0001, 1.0001})
+//				new MMAX(20, 50, new double[]{1.0001, 1.0001})
 		};
 		
 		// #Obvious #Troll #C'estDégueulasse
