@@ -1,5 +1,10 @@
 package action;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -15,15 +20,60 @@ public class CompanySymbol {
 
 	public static String[] CAC40_SYMBOLS = new String[] {"AC","AI","ALU","ALO","MTP","CS","BNP","EN","CAP","CA","ACA","BN","EAD","EDF","EF","FTE","GSZ","OR","LG","LR","MC","ML","RI","UG","PP","PUB","RNO","SAF","SGO","SAN","SU","GLE","STM","TEC","FP","UL","VK","VIE","DG","VIV"};
 
-	public static void getNasdaqSymbols() {
+	/**
+	 * Returns the Nasdaq symbols.
+	 * @return
+	 */
+	public static String[] getNasdaqSymbols() {
+		ArrayList<String> symbols = new ArrayList<>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(new File("res/nasdaqSymbols")));
+			String line = br.readLine();
+			while (line != null) {
+				symbols.add(line);
+				line = br.readLine();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String[] symbolTable = new String[symbols.size()];
+		for (int i=0; i<symbolTable.length; i++) {
+			symbolTable[i] = symbols.get(i);
+		}
+		return symbolTable;
+	}
+	
+	/**
+	 * This method only needs to be run periodically. It fetches
+	 * the Nasdaq symbol from Boursorama website. It parses every
+	 * page so it is quite slow.
+	 */
+	public static void fetchNasdaqSymbols() {
 		ArrayList<String> symbols = new ArrayList<>();
 		for (int page = 1; page < 61; page++) {
 			symbols.addAll(vacuumNasdaqPage(page));
 		}
 		System.out.println(symbols.size());
+		saveNasdaqSymbols(symbols);
+		System.out.println("saved");
 	}
 	
-	public static ArrayList<String> vacuumNasdaqPage (int pageNumber) {
+	private static void saveNasdaqSymbols(ArrayList<String> symbols) {
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File("res/nasdaqSymbols")));
+			for(String symbol : symbols) {
+				bw.write(symbol);
+				bw.newLine();
+			}
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static ArrayList<String> vacuumNasdaqPage (int pageNumber) {
 		System.out.println("Page number = " + pageNumber);
 		ArrayList<String> symbols = new ArrayList<>();
 		try{
@@ -57,7 +107,10 @@ public class CompanySymbol {
 	}
 	
 	public static void main(String[] args) {
-		getNasdaqSymbols();
+		String[] symbols = getNasdaqSymbols();
+		for (String s : symbols) {
+			System.out.println(s);
+		}
 	}
 
 }
