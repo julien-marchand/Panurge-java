@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import plot.JFreeChartPlot;
+import plot.JFreeChartSerie;
 import algos.ChoiceAlgo;
 import algos.StockGT;
 import algos.StockLT;
@@ -27,7 +29,7 @@ public class Action {
 	private double[] open;
 	private double[] high;
 	private double[] low;
-	private double[] close;
+	public double[] close;
 	private double[] volume;
 	private double[] adjClose;
 	
@@ -54,6 +56,13 @@ public class Action {
 	
 	private void computeRating() {
 		// TODO compute a score describing the quality of the algorithm for the past 6-months period
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -206,6 +215,10 @@ public class Action {
 //		double[] sDown = stocDSS;
 		int holdingDuration = 5;
 		int analysisLength = 3650;
+
+		JFreeChartPlot.plotGraph(getName(), new JFreeChartSerie[]{
+			new JFreeChartSerie("Close", close)
+			});
 		
 		ChoiceAlgo[] AlgosToBeExecuted = new ChoiceAlgo[]{
 				new StockLT(5, 0.03),

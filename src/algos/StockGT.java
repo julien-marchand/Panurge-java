@@ -7,6 +7,7 @@ import action.Action;
 
 public class StockGT extends ChoiceAlgo {
 	private double limit = 1;
+	public String name = "Stock GT " + limit + " for: ";
 	
 	public StockGT(int holdingDuration, double limit) {
 		this.holdingDuration = holdingDuration;
@@ -14,6 +15,7 @@ public class StockGT extends ChoiceAlgo {
 	}
 	
 	public int buyOrSell(Action action, int time) {
+		
 		double[] stoc = action.stocD;
 		if(stoc[time] > limit) {
 //		if(stoc[time+1] > limit)

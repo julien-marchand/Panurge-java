@@ -13,7 +13,7 @@ public class StockLT extends ChoiceAlgo {
 		this.limit =  limit;
 	}
 	
-	public int buyOrSell(Action action, int time){
+	public int buyOrSell(Action action, int time) {
 		double[] stoc = action.stocD;
 		if(stoc[time] < limit) {
 //		if(stoc[time+1] < limit)

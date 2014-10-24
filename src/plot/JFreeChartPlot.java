@@ -19,7 +19,7 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class JFreeChartPlot {
 	
-	public static JPanel createGraph(String title, JFreeChartSerie... datas) {
+	private static JPanel createGraph(String title, JFreeChartSerie... datas) {
         XYSeriesCollection dataset = new XYSeriesCollection();
         for(JFreeChartSerie data : datas)
         	dataset.addSeries(prepareSerie(data.getData(), data.getName()));
@@ -38,7 +38,7 @@ public class JFreeChartPlot {
         return panel;
     }
 	
-	public static XYSeries prepareSerie(double[] data, String name) {
+	private static XYSeries prepareSerie(double[] data, String name) {
         XYSeries series = new XYSeries(name);
 		for(int i = 0; i<data.length; ++i) {
 			series.add(i, data[i]);
@@ -49,10 +49,7 @@ public class JFreeChartPlot {
 	public static void plotGraph(String title, JFreeChartSerie... data) {
         JFrame f = new JFrame(title);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.add(createGraph(title,
-        		new JFreeChartSerie("test1", new double[]{1,4,5,2}),
-        		new JFreeChartSerie("test2", new double[]{1,5,4,3,2})
-        		));
+        f.add(createGraph(title, data));
         f.setSize(800,800);
         f.setLocation(200,200);
         f.setVisible(true);
